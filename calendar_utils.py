@@ -13,11 +13,12 @@ def parse_reminder(text: str):
     else:
         base_date = now
 
-    time_match = re.search(r'(下午)?(\d{1,2})[:點](\d{2})?', text)
+    # 支援「下午」「晚上」
+    time_match = re.search(r'(下午|晚上)?(\d{1,2})[:點](\d{2})?', text)
     if time_match:
         hour = int(time_match.group(2))
         minute = int(time_match.group(3)) if time_match.group(3) else 0
-        if time_match.group(1):
+        if time_match.group(1):  # 有「下午」或「晚上」
             if hour < 12:
                 hour += 12
         event_time = base_date.replace(hour=hour, minute=minute, second=0, microsecond=0)
@@ -41,5 +42,5 @@ def parse_reminder(text: str):
     event_time_utc = event_time.astimezone(timezone('UTC'))
     return {
         "time": event_time_utc.strftime("%Y-%m-%dT%H:%M:%S"),
-        "event": event
+        "event": event.strip()
     }
